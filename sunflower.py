@@ -2,6 +2,7 @@ import moving
 
 min_petals = 7
 max_petals = 15
+different_petal_count = max_petals - min_petals + 1
 
 def plant_sunflower():
 	while get_water() < 0.9:
@@ -11,49 +12,37 @@ def plant_sunflower():
 
 
 def farm():
-	petal_measures = []
-
-	for i in range(9):
-		petal_measures.append([])
-		
-	for x in range(get_world_size()):
-		for y in range(get_world_size()):
-			if get_ground_type() != Grounds.Soil:
-				till()
-			
-			plant_sunflower()
-			petal_count = measure()
-			coords = x, y
-			measure_score = petal_count - min_petals
-			petal_measures[measure_score].append(coords)
-						
-			move(North)
-		move(East)
-		
 	while num_items(Items.Power) < 10000:
-		score_to_harvest = None
+		petal_measures = []
 
-		while score_to_harvest == None:
-			for i in range(9):
-				if petal_measures[8 - i].len() > 0:
-					score_to_harvest = 8 - i
-					break
+		for i in range(different_petal_count):
+			petal_measures.append([])
+			
+		for x in range(get_world_size()):
+			for y in range(get_world_size()):
+				if get_ground_type() != Grounds.Soil:
+					till()
+				
+				plant_sunflower()
+				petal_count = measure()
+				coords = x, y
+				measure_score = petal_count - min_petals
+				petal_measures[measure_score].append(coords)
+							
+				move(North)
+			move(East)
+			
+		for i in range(different_petal_count):
+			while petal_measures[8 - i].len() > 0:
+				coords_to_check = petal_measures[8 - i]
+				x, y = coords_to_check.pop(0)
+				moving.to(x, y)
+				coords = x, y
 
-		coords_to_check = petal_measures[score_to_harvest]
-		x, y = coords_to_check.pop(0)
-		moving.to(x, y)
-		coords = x, y
+				if can_harvest():
+					harvest()
 
-		if can_harvest():
-			harvest()
-
-			plant_sunflower()
-
-			petal_count = measure()
-			measure_score = petal_count - min_petals
-			petal_measures[measure_score].append(coords)
-		
-		else:
-			coords_to_check.append(coords)
+				else:
+					coords_to_check.append(coords)
 
 

@@ -3,6 +3,13 @@ import moving
 min_petals = 7
 max_petals = 15
 
+def plant_sunflower():
+	while get_water() < 0.9:
+		use_item(Items.Water)
+
+	plant(Entities.Sunflower)
+
+
 def farm():
 	petal_measures = []
 
@@ -14,7 +21,7 @@ def farm():
 			if get_ground_type() != Grounds.Soil:
 				till()
 			
-			plant(Entities.Sunflower)		
+			plant_sunflower()
 			petal_count = measure()
 			coords = x, y
 			measure_score = petal_count - min_petals
@@ -35,20 +42,18 @@ def farm():
 		coords_to_check = petal_measures[score_to_harvest]
 		x, y = coords_to_check.pop(0)
 		moving.to(x, y)
+		coords = x, y
 
 		if can_harvest():
-			debug = num_items(Items.Power)
 			harvest()
-			quick_print(num_items(Items.Power) - debug)
 
-			plant(Entities.Sunflower)		
+			plant_sunflower()
+
 			petal_count = measure()
-			coords = x, y
 			measure_score = petal_count - min_petals
 			petal_measures[measure_score].append(coords)
 		
 		else:
-			coords = x, y
 			coords_to_check.append(coords)
 
 

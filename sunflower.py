@@ -5,7 +5,7 @@ max_petals = 15
 different_petal_count = max_petals - min_petals + 1
 
 def plant_sunflower():
-	while get_water() < 0.9:
+	while get_water() < 0.5:
 		use_item(Items.Water)
 
 	plant(Entities.Sunflower)
@@ -20,6 +20,7 @@ def farm():
 			
 		for x in range(get_world_size()):
 			for y in range(get_world_size()):
+				moving.to(x, y)
 				if get_ground_type() != Grounds.Soil:
 					till()
 				
@@ -28,9 +29,6 @@ def farm():
 				coords = x, y
 				measure_score = petal_count - min_petals
 				petal_measures[measure_score].append(coords)
-							
-				move(North)
-			move(East)
 			
 		for i in range(different_petal_count):
 			while petal_measures[8 - i].len() > 0:
@@ -40,7 +38,9 @@ def farm():
 				coords = x, y
 
 				if can_harvest():
+					power = num_items(Items.Power)
 					harvest()
+					quick_print(num_items(Items.Power) - power)
 
 				else:
 					coords_to_check.append(coords)

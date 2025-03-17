@@ -1,7 +1,6 @@
-import pumpkin
+import sunflower
 
 clear()
 
-while True:
-	pumpkin.farm()
+sunflower.farm()
 	

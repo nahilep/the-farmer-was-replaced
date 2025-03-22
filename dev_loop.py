@@ -1,6 +1,7 @@
-import sunflower
+import cactus
 
 clear()
 
-sunflower.farm()
+while num_items(Items.Cactus) < 40000:
+    cactus.farm()
 	

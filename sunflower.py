@@ -12,7 +12,7 @@ def plant_sunflower():
 
 
 def farm():
-	while num_items(Items.Power) < 10000:
+	while num_items(Items.Power) < 100000:
 		petal_measures = []
 
 		for i in range(different_petal_count):

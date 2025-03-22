@@ -40,7 +40,6 @@ def farm():
 				if can_harvest():
 					power = num_items(Items.Power)
 					harvest()
-					quick_print(num_items(Items.Power) - power)
 
 				else:
 					coords_to_check.append(coords)

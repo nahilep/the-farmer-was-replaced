@@ -15,6 +15,7 @@ def plant_square(size = get_world_size()):
 	global measurements
 
 	measurements = []
+	moving.to(0, 0)
 
 	for i in range(size):
 		measurements.append([])
@@ -24,8 +25,7 @@ def plant_square(size = get_world_size()):
 			moving.to(x, y)
 			plant_cactus()
 			measurements[y].append(measure())
-			# TODO: figure out why this crashes sometimes
-			# sort_field(x, y, size)
+			sort_field(x, y, True)
 
 	sort_square(size)
 
@@ -43,7 +43,7 @@ def move_to_and_swap(x, y, direction):
 	moving.to(x, y)
 	swap(direction)
 
-def swap_with_measurement(x, y, direction):
+def check_and_perform_swap(x, y, direction):
 	global measurements
 
 	if direction == West and measurements[y][x - 1] > measurements[y][x]:
@@ -66,41 +66,52 @@ def swap_with_measurement(x, y, direction):
 		swap_measurements((x, y), (x, y + 1))
 		return True
 
+	return False
 
-def sort_field(x, y, size = get_world_size()):
+
+def sort_field(x, y, is_sort_after_planting = False):
 	global measurements
 
-	hasSwapped = False
-	if x > 0 and measure(West):
-		if swap_with_measurement(x, y, West):
-			hasSwapped = True
-	if x < size - 1 and measure(East):
-		if swap_with_measurement(x, y, East):
-			hasSwapped = True
-	if y > 0 and measure(South):
-		if swap_with_measurement(x, y, South):
-			hasSwapped = True
-	if y < size - 1 and measure(North):
-		if swap_with_measurement(x, y, North):
-			hasSwapped = True
+	swapped = False
 
-	return hasSwapped
+	if x > 0:
+		if check_and_perform_swap(x, y, West):
+			swapped = True
+	if x < measurements[y].len() - 1 and not is_sort_after_planting:
+		if check_and_perform_swap(x, y, East):
+			swapped = True
+	if y < measurements.len() - 1 and not is_sort_after_planting:
+		if check_and_perform_swap(x, y, North):
+			swapped = True
+	if y > 0:
+		if check_and_perform_swap(x, y, South):
+			swapped = True
 
-def sort_square(size = get_world_size()):
+	return swapped
+
+def sort_square(size):
 	hasSwapped = True
 
 	while hasSwapped:
 		hasSwapped = False
 
-		for x in range(size):
-			for y in range(size):
-				if sort_field(x, y, size):
+		for y in range(size):
+			for x in range(size):
+				if sort_field(x, y):
 					hasSwapped = True
 
 def farm():
-	global measurements
-
 	plant_square()
-	quick_print(measurements)
-	harvest()
-	
+
+	# Other plants might not be done either, which leads to lower yield harvests
+	# It seems to be only an issue if the size to farm is small and the speed of the
+	# drone is high.
+	# It also seems to not break the next iteration since the measurements will be
+	# cached again in the planting cycle
+	# Good enough for me right now
+	harvested = False
+
+	while not harvested:
+		if can_harvest():
+			harvest()
+			harvested = True
